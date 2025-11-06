@@ -1,12 +1,7 @@
-﻿using System;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
+// Correct namespace for your project
 namespace UMFST.MIP.Variant2.Models
 {
     // --- DATABASE ENTITY MODELS ---
@@ -17,47 +12,43 @@ namespace UMFST.MIP.Variant2.Models
         public string Name { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
-        public virtual ICollection<Car> Cars { get; set; } = new List<Car>();
+        public ICollection<Car> Cars { get; set; } = new List<Car>();
     }
 
     public class Car
     {
         public int CarId { get; set; }
         public int ClientId { get; set; }
-        [ForeignKey("ClientId")]
-        public virtual Client Client { get; set; }
+        public Client Client { get; set; }
         public string Make { get; set; }
         public string Model { get; set; }
         public int Year { get; set; }
         public string VIN { get; set; }
         public int Odometer { get; set; }
-        public virtual ICollection<WorkOrder> WorkOrders { get; set; } = new List<WorkOrder>();
-        public virtual ICollection<Diagnostic> Diagnostics { get; set; } = new List<Diagnostic>();
+        public ICollection<WorkOrder> WorkOrders { get; set; } = new List<WorkOrder>();
+        public ICollection<Diagnostic> Diagnostics { get; set; } = new List<Diagnostic>();
     }
 
     public class WorkOrder
     {
         public int WorkOrderId { get; set; }
         public int CarId { get; set; }
-        [ForeignKey("CarId")]
-        public virtual Car Car { get; set; }
+        public Car Car { get; set; }
         public int MechanicId { get; set; }
-        [ForeignKey("MechanicId")]
-        public virtual Mechanic Mechanic { get; set; }
+        public Mechanic Mechanic { get; set; }
         public string Date { get; set; } // Using string for simplicity from JSON
         public string Description { get; set; }
         public string Status { get; set; }
-        public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
-        public virtual ICollection<Part> Parts { get; set; } = new List<Part>();
-        public virtual Invoice Invoice { get; set; }
+        public ICollection<Task> Tasks { get; set; } = new List<Task>();
+        public ICollection<Part> Parts { get; set; } = new List<Part>();
+        public Invoice Invoice { get; set; }
     }
 
     public class Task
     {
         public int TaskId { get; set; }
         public int WorkOrderId { get; set; }
-        [ForeignKey("WorkOrderId")]
-        public virtual WorkOrder WorkOrder { get; set; }
+        public WorkOrder WorkOrder { get; set; }
         public string Description { get; set; }
         public decimal LaborHours { get; set; }
         public decimal Rate { get; set; }
@@ -67,8 +58,7 @@ namespace UMFST.MIP.Variant2.Models
     {
         public int PartId { get; set; }
         public int WorkOrderId { get; set; }
-        [ForeignKey("WorkOrderId")]
-        public virtual WorkOrder WorkOrder { get; set; }
+        public WorkOrder WorkOrder { get; set; }
         public string Name { get; set; }
         public int Quantity { get; set; }
         public decimal UnitPrice { get; set; }
@@ -79,15 +69,14 @@ namespace UMFST.MIP.Variant2.Models
         public int MechanicId { get; set; }
         public string Name { get; set; }
         public string Specialization { get; set; }
-        public virtual ICollection<WorkOrder> WorkOrders { get; set; } = new List<WorkOrder>();
+        public ICollection<WorkOrder> WorkOrders { get; set; } = new List<WorkOrder>();
     }
 
     public class Invoice
     {
-        [Key, ForeignKey("WorkOrder")]
         public int InvoiceId { get; set; }
         public int WorkOrderId { get; set; }
-        public virtual WorkOrder WorkOrder { get; set; }
+        public WorkOrder WorkOrder { get; set; }
         public decimal Amount { get; set; } // This will be the one from JSON, we compute the real total.
         public string Date { get; set; }
         public bool IsPaid { get; set; }
@@ -98,26 +87,34 @@ namespace UMFST.MIP.Variant2.Models
     {
         public int DiagnosticId { get; set; }
         public int CarId { get; set; }
-        [ForeignKey("CarId")]
-        public virtual Car Car { get; set; }
+        public Car Car { get; set; }
         public string Date { get; set; }
         public string OBDCodes { get; set; } // Comma-separated list
-        public virtual ICollection<Test> Tests { get; set; } = new List<Test>();
+        public ICollection<Test> Tests { get; set; } = new List<Test>();
     }
 
     public class Test
     {
         public int TestId { get; set; }
         public int DiagnosticId { get; set; }
-        [ForeignKey("DiagnosticId")]
-        public virtual Diagnostic Diagnostic { get; set; }
+        public Diagnostic Diagnostic { get; set; }
         public string Name { get; set; }
         public string Result { get; set; }
         public bool IsOk { get; set; }
     }
 
+    // --- View Model for Work Order Data Grid ---
+    public class WorkOrderViewModel
+    {
+        public int WorkOrderId { get; set; }
+        public string Car { get; set; }
+        public string Status { get; set; }
+        public string PaidStatus { get; set; }
+        public decimal TotalCost { get; set; }
+    }
+
+
     // --- CLASSES FOR JSON DESERIALIZATION ---
-    // These classes match the structure of the JSON file
 
     public class JsonDataRoot
     {
@@ -213,7 +210,7 @@ namespace UMFST.MIP.Variant2.Models
     {
         [JsonProperty("invoice_id")]
         public int InvoiceId { get; set; }
-        public decimal Amount { get; set; } // Note: JSON has "amount" as string/number mix
+        public decimal Amount { get; set; }
         public string Date { get; set; }
         [JsonProperty("is_paid")]
         public bool IsPaid { get; set; }
