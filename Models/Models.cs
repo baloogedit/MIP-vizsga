@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-// Correct namespace for your project
 namespace UMFST.MIP.Variant2.Models
 {
     // --- DATABASE ENTITY MODELS ---
